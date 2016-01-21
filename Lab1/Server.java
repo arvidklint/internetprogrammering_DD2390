@@ -40,16 +40,24 @@ class ServerWorker implements Runnable {
 		}
 	}
 
-	public void broadcastAll(String _message) {
+	public synchronized void broadcastAll(String _message) {
 		for (Socket socket : sockets) {
-			try{
+			try {
 				PrintStream output = new PrintStream(socket.getOutputStream());
 				output.println(_message);
 				output.flush();
-				System.out.println("Broadcasted to all users, message: " + _message);
 			} catch(IOException e) {
 				System.err.println("Error (unable to broadcast to " + socket.getInetAddress() + "): " + e);
 			}
+		}
+	}
+
+	public void removeSocket(Socket _socket) {
+		sockets.remove(_socket);
+		System.out.println("Removed connection, source address: " + _socket.getInetAddress());
+		System.out.println("Current sockets: ");
+		for(Socket socket : sockets) {
+			System.out.println("Source address: " + socket.getInetAddress());
 		}
 	}
 }
@@ -68,10 +76,30 @@ class ServerConnection implements Runnable {
 		try {
 			BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			while (running) {
-				serverWorker.broadcastAll(input.readLine());
+				if (!socket.isClosed()) {
+					String message = input.readLine();
+					if (message.equals("@logout")) {
+						removeConnection();
+					} else {
+						serverWorker.broadcastAll(message);
+					}
+				} else {
+					removeConnection();
+				}
 			}
 		} catch(IOException e) {
 			System.err.println("Error (ServerConnection): " + e);
 		}
+	}
+
+	private void removeConnection() {
+		try{
+			serverWorker.removeSocket(socket);
+			socket.shutdownOutput();
+			socket.close();
+			running = false;
+		} catch(IOException e) {
+			System.err.println("Error (unable to remove connection): " + e);
+		} 
 	}
 }
