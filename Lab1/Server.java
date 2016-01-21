@@ -12,13 +12,14 @@ public class Server {
 
 class ServerWorker implements Runnable {
 	boolean running = true;
-	ArrayList<Socket> sockets;
+	//ArrayList<Socket> sockets;
 	ServerSocket serverSocket;
+	ArrayList<ServerConnection> connections;
 
 	ServerWorker(int _port) {
 		try {
 			serverSocket = new ServerSocket(_port);
-			sockets = new ArrayList<Socket>();
+			connections = new ArrayList<ServerConnection>();
 			System.out.println("Server started, port: " + _port);
 		} catch(IOException e) {
 			System.err.println("Error (unable to start server)");
@@ -29,9 +30,10 @@ class ServerWorker implements Runnable {
 		while(running) {
 			try {
 				Socket socket = serverSocket.accept();
-				sockets.add(socket);
+				//sockets.add(socket);
 				ServerConnection client = new ServerConnection(socket, this);
 				Thread clientThread = new Thread(client);
+				connections.add(client);
 				clientThread.start();
 				System.out.println("New connection established, source address: " + socket.getInetAddress());
 			} catch (IOException e) {
@@ -41,39 +43,49 @@ class ServerWorker implements Runnable {
 	}
 
 	public synchronized void broadcastAll(String _message, String _username, String _id) {
-		for (Socket socket : sockets) {
-			if (!socket.getInetAddress().toString().equals(_id)) {
-				try {
-					PrintStream output = new PrintStream(socket.getOutputStream());
-					output.println(_username + ": " + _message);
-					output.flush();
-				} catch(IOException e) {
-					System.err.println("Error (unable to broadcast to " + socket.getInetAddress() + "): " + e);
-				}
+		for (ServerConnection connection : connections) {
+			if (!connection.socket.getInetAddress().toString().equals(_id)) {
+				sendMessage(connection, _message, _username);
 			}
 		}
 	}
 
-	public synchronized void broadcastTo(String _message, String username) {
-		
+	public synchronized void broadcastTo(String _message, String _receivingUser, String _sourceUser) {
+		for(ServerConnection connection : connections){
+			if(connection.username.equals(_receivingUser)){
+				System.out.println("Sending message to: " + _receivingUser);
+				sendMessage(connection, _message, _sourceUser);
+				break;
+			}
+		}
 	}
 
-	public synchronized void removeSocket(Socket _socket) {
-		sockets.remove(_socket);
-		System.out.println("Removed connection, source address: " + _socket.getInetAddress());
+	private void sendMessage(ServerConnection _connection, String _message, String _sourceUser) {
+		try {
+			PrintStream output = new PrintStream(_connection.socket.getOutputStream());
+			output.println(_sourceUser + ": " + _message);
+			output.flush();
+		}catch(IOException e) {
+			System.err.println("Error (unable to broadcast to " + _connection.socket.getInetAddress() + "): " + e);
+		}
+	}
+
+	public synchronized void removeConnectionFromList(ServerConnection _connection) {
+		connections.remove(_connection);
+		System.out.println("Removed connection, source address: " + _connection.socket.getInetAddress());
 		System.out.println("Current sockets: ");
-		for(Socket socket : sockets) {
-			System.out.println("Source address: " + socket.getInetAddress());
+		for(ServerConnection connection : connections) {
+			System.out.println("Source address: " + connection.socket.getInetAddress());
 		}
 	}
 }
 
 class ServerConnection implements Runnable {
 	boolean running = true;
-	Socket socket;
+	public Socket socket;
 	ServerWorker serverWorker;
-	String username = "";
-	String id = "";
+	public String username = "";
+	public String id = "";
 
 	ServerConnection(Socket _socket, ServerWorker _serverWorker) {
 		socket = _socket;
@@ -98,6 +110,8 @@ class ServerConnection implements Runnable {
 							username = tokens.nextToken();
 						} else if (command.equals("@whisper")) {
 							String reciever = tokens.nextToken();
+							String privateMessage = tokens.nextToken("");
+							serverWorker.broadcastTo(privateMessage, reciever, username);
 
 						}
 						else {
@@ -115,7 +129,7 @@ class ServerConnection implements Runnable {
 
 	private void removeConnection() {
 		try{
-			serverWorker.removeSocket(socket);
+			serverWorker.removeConnectionFromList(this);
 			socket.shutdownOutput();
 			socket.close();
 			running = false;
