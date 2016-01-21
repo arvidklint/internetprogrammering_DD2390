@@ -54,7 +54,11 @@ class ServerWorker implements Runnable {
 		}
 	}
 
-	public void removeSocket(Socket _socket) {
+	public synchronized void broadcastTo(String _message, String username) {
+		
+	}
+
+	public synchronized void removeSocket(Socket _socket) {
 		sockets.remove(_socket);
 		System.out.println("Removed connection, source address: " + _socket.getInetAddress());
 		System.out.println("Current sockets: ");
@@ -85,13 +89,20 @@ class ServerConnection implements Runnable {
 				if (!socket.isClosed()) {
 					String message = input.readLine();
 					StringTokenizer tokens = new StringTokenizer(message, " ");
-					String command = tokens.nextToken();
-					if (command.equals("@logout")) {
-						removeConnection();
-					} else if (command.equals("@username")) {
-						username = tokens.nextToken();
-					} else {
-						serverWorker.broadcastAll(message, username, id);
+					
+					if (tokens.hasMoreTokens()) {
+						String command = tokens.nextToken();
+						if (command.equals("@logout")) {
+							removeConnection();
+						} else if (command.equals("@username")) {
+							username = tokens.nextToken();
+						} else if (command.equals("@whisper")) {
+							String reciever = tokens.nextToken();
+
+						}
+						else {
+							serverWorker.broadcastAll(message, username, id);
+						}
 					}
 				} else {
 					removeConnection();
