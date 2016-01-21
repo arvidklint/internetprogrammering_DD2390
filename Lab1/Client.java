@@ -49,9 +49,23 @@ class OutputThread implements Runnable {
 			try{
 				message = userInput.readLine();
 				sendMessage(message);
+
+				if(message.equals("@logout")){
+					shutdown();
+				}
 			}catch(IOException e){
 				System.err.println("Error in userInput: " + e);
 			}
+		}
+	}
+
+	public synchronized void shutdown() {
+		try{
+			socket.shutdownOutput();
+			socket.close();
+			running = false;
+		}catch(IOException e){
+			System.err.println("Error, unable to shut down: " + e);
 		}
 	}
 
@@ -78,15 +92,17 @@ class InputThread implements Runnable {
 
 	public void run(){
 		while(running){
-			try{
-				if(!socket.isClosed()){
+			if(!socket.isClosed()){
+				try{
 					msg = input.readLine();
-					System.out.println(msg);
-				}else{
-					running = false;
+					if(msg != null){
+						System.out.println(msg);
+					}
+				}catch(IOException e){
+					System.out.println(e.getMessage());
 				}
-			}catch(IOException e){
-				System.out.println("Error recieving message: " + e);
+			}else{
+				running = false;
 			}
 		}
 	}
