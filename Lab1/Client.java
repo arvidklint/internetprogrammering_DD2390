@@ -1,55 +1,93 @@
 import java.util.Scanner;
 import java.net.*;
+import java.io.*;
 
 public class Client {
-	PrintStream output;
-	BufferedReader input;
 
 	public static void main(String[] args) {
-		String host = args[1];
-		int port = args[2];
-		if (args[3]) {
-			String fileName = args[3];
+		String host = args[0];
+		int port = Integer.parseInt(args[1]);
+		if (args.length > 2) {
+			String fileName = args[2];
 		}
 
 		try {
 			Socket socket = new Socket(host, port);
-			output = new PrintStream(socket.getOutputStream());
-			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			OutputThread outputThread(this);
-			InputThread inputThread(this);
+			OutputThread output = new OutputThread(socket);
+			InputThread input = new InputThread(socket);
+			Thread outputThread = new Thread(output);
+			Thread inputThread = new Thread(input);
+			outputThread.start();
+			inputThread.start();
 		} catch(IOException e) {
 			System.err.println("Error: " + e);
 		}
 	}
-
-	public synchronized sendMessage(String _message) {
-		output.println("message");
-		output.flush();
-	}
 }
 
 class OutputThread implements Runnable {
+	Boolean running = true;
 	String message = "";
-	Client client = null;
 	String id = null;
+	Socket socket = null;
+	PrintStream output;
+   	BufferedReader userInput;
 
-	OutputThread(Client _client) {
-		client = _client;
+
+	OutputThread(Socket _socket) {
+		socket = _socket;
+		try{
+			output = new PrintStream(socket.getOutputStream());
+		}catch(IOException e){
+			System.err.println("Error in OutputThread: " + e);
+		}
 	}
 
 	public void run() {
 		while (running) {
-			Scanner scan = new Scanner(System.in);
-			message = scan.next();
-			client.sendMessage(id, message);
+			userInput = new BufferedReader(new InputStreamReader(System.in));
+			try{
+				message = userInput.readLine();
+				sendMessage(message);
+			}catch(IOException e){
+				System.err.println("Error in userInput: " + e);
+			}
 		}
+	}
+
+	public synchronized void sendMessage(String message) {
+		output.println(message);
+		output.flush();
 	}
 }
 
 class InputThread implements Runnable {
+	Boolean running = true;
+	Socket socket = null;
+	BufferedReader input;
+	String msg = "";
 
-	InputThread() {
+	InputThread(Socket _socket) {
+		socket = _socket;
+		try{
+			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		}catch(IOException e){
+			System.err.println("Error in InputThread: " + e);
+		}
+	}
 
+	public void run(){
+		while(running){
+			try{
+				if(!socket.isClosed()){
+					msg = input.readLine();
+					System.out.println(msg);
+				}else{
+					running = false;
+				}
+			}catch(IOException e){
+				System.out.println("Error recieving message: " + e);
+			}
+		}
 	}
 }
