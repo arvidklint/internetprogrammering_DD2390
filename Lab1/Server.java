@@ -40,14 +40,16 @@ class ServerWorker implements Runnable {
 		}
 	}
 
-	public synchronized void broadcastAll(String _message) {
+	public synchronized void broadcastAll(String _message, String _username, String _id) {
 		for (Socket socket : sockets) {
-			try {
-				PrintStream output = new PrintStream(socket.getOutputStream());
-				output.println(_message);
-				output.flush();
-			} catch(IOException e) {
-				System.err.println("Error (unable to broadcast to " + socket.getInetAddress() + "): " + e);
+			if (!socket.getInetAddress().toString().equals(_id)) {
+				try {
+					PrintStream output = new PrintStream(socket.getOutputStream());
+					output.println(_username + ": " + _message);
+					output.flush();
+				} catch(IOException e) {
+					System.err.println("Error (unable to broadcast to " + socket.getInetAddress() + "): " + e);
+				}
 			}
 		}
 	}
@@ -66,9 +68,13 @@ class ServerConnection implements Runnable {
 	boolean running = true;
 	Socket socket;
 	ServerWorker serverWorker;
+	String username = "";
+	String id = "";
 
 	ServerConnection(Socket _socket, ServerWorker _serverWorker) {
 		socket = _socket;
+		username = socket.getInetAddress().toString();
+		id = socket.getInetAddress().toString();
 		serverWorker = _serverWorker;
 	}
 
@@ -78,10 +84,14 @@ class ServerConnection implements Runnable {
 			while (running) {
 				if (!socket.isClosed()) {
 					String message = input.readLine();
-					if (message.equals("@logout")) {
+					StringTokenizer tokens = new StringTokenizer(message, " ");
+					String command = tokens.nextToken();
+					if (command.equals("@logout")) {
 						removeConnection();
+					} else if (command.equals("@username")) {
+						username = tokens.nextToken();
 					} else {
-						serverWorker.broadcastAll(message);
+						serverWorker.broadcastAll(message, username, id);
 					}
 				} else {
 					removeConnection();
