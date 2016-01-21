@@ -10,10 +10,13 @@ public class Client {
 		if (args.length > 2) {
 			String fileName = args[2];
 		}
-
+		Scanner scanner = new Scanner(System.in);
+		System.out.print("Username: ");
+		String username = scanner.next();
+		
 		try {
 			Socket socket = new Socket(host, port);
-			OutputThread output = new OutputThread(socket);
+			OutputThread output = new OutputThread(socket, username);
 			InputThread input = new InputThread(socket);
 			Thread outputThread = new Thread(output);
 			Thread inputThread = new Thread(input);
@@ -28,16 +31,19 @@ public class Client {
 class OutputThread implements Runnable {
 	Boolean running = true;
 	String message = "";
+	String username = "";
 	String id = null;
 	Socket socket = null;
 	PrintStream output;
    	BufferedReader userInput;
 
 
-	OutputThread(Socket _socket) {
+	OutputThread(Socket _socket, String _username) {
 		socket = _socket;
+		username = _username;
 		try{
 			output = new PrintStream(socket.getOutputStream());
+			sendMessage("@username " + username);
 		}catch(IOException e){
 			System.err.println("Error in OutputThread: " + e);
 		}
