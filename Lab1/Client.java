@@ -212,6 +212,7 @@ class InputThread implements Runnable {
 								String sourceUser = tokens.nextToken();
 								String sourceIP = tokens.nextToken();
 								int port = Integer.parseInt(tokens.nextToken());
+								System.out.println(sourceIP + " " + port);
 								if(client.removeFileRequest(sourceUser)) {
 									FileReceiver fileReceiver = new FileReceiver(sourceIP, port);
 									Thread fileReceiverThread = new Thread(fileReceiver);
@@ -226,8 +227,10 @@ class InputThread implements Runnable {
 								String receiver = tokens.nextToken();
 								String answer = tokens.nextToken();
 								if (answer.equals("yes")) {
+									System.out.println(receiver + " answered yes to request to send file.");
 									String fileRequest = client.getFileRequest(receiver); // Check if the filerequest exist
 									if (fileRequest != null) {
+										System.out.println("Initialising filesender");
 										String ip = socket.getLocalAddress().toString().substring(1);
 										int port = 1338;
 										FileSender fileSender = new FileSender(ip, port);
@@ -272,6 +275,7 @@ class FileSender implements Runnable {
 		myIP = _myIP;
 		try {
 			serverSocket = new ServerSocket(port);
+			System.err.println("initialized serversocket for file transfer");
 		} catch(IOException e) {
 			System.err.println("Filesender could not initialize serverSocket");
 		}
@@ -279,6 +283,7 @@ class FileSender implements Runnable {
 
 	public void run() {
 		try {
+			System.out.println("Waiting for connection.");
 			socket = serverSocket.accept();
 			System.out.println("filesocket connected: " + socket.getInetAddress());
 		} catch(IOException e) {
@@ -295,13 +300,15 @@ class FileReceiver implements Runnable {
 	FileReceiver(String _sourceIP, int _port) {
 		sourceIP = _sourceIP;
 		port = _port;
-	}
-
-	public void run() {
 		try {
+			System.out.println(sourceIP+  " " + port);
 			socket = new Socket(sourceIP, port);
 		} catch(Exception e) {
 			System.err.println("Filereceiver could not open socket: " + e);
 		}
+	}
+
+	public void run() {
+		
 	}
 }
