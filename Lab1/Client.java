@@ -330,6 +330,7 @@ class FileSender implements Runnable {
 				if (outputStream != null) outputStream.close();
 				if (bufferedInputStream != null) bufferedInputStream.close();
 				if (socket != null) socket.close();
+				if (serverSocket != null) serverSocket.close();
 			} catch(IOException e) {
 				System.err.println("Could not close shit.");
 			}
