@@ -256,7 +256,8 @@ class InputThread implements Runnable {
 										sendMessage("@filesocketopen " + receiver + " " + ip + " " + port);
 									}
 								} else {
-
+									client.removeFileRequest(receiver);
+									System.out.println("File transfer has been rejected.");
 								}
 							}
 
