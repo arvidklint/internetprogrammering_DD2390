@@ -2,21 +2,18 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-public class Server {
+public class Server implements Runnable{
 	public static void main(String[] args) throws IOException {
-		ServerWorker serverWorker = new ServerWorker(1337);
-		Thread serverWorkerThread = new Thread(serverWorker);
-		serverWorkerThread.start();
+		Server server = new Server(1337);
+		Thread serverThread = new Thread(server);
+		serverThread.start();
 	}
-}
 
-class ServerWorker implements Runnable {
 	boolean running = true;
-	//ArrayList<Socket> sockets;
 	ServerSocket serverSocket;
 	ArrayList<ServerConnection> connections;
 
-	ServerWorker(int _port) {
+	Server(int _port) {
 		try {
 			serverSocket = new ServerSocket(_port);
 			connections = new ArrayList<ServerConnection>();
@@ -42,28 +39,29 @@ class ServerWorker implements Runnable {
 		}
 	}
 
-	public synchronized void broadcastAll(String _message, String _username, String _id) {
+	public synchronized void broadcastAll(String _message, String _id) {
 		for (ServerConnection connection : connections) {
 			if (!connection.socket.getInetAddress().toString().equals(_id)) {
-				sendMessage(connection, _message, _username);
+				System.out.println("Broadcasting message to all users.");
+				sendMessage(connection, _message);
 			}
 		}
 	}
 
-	public synchronized void broadcastTo(String _message, String _receivingUser, String _sourceUser) {
+	public synchronized void broadcastTo(String _message, String _receivingUser) {
 		for(ServerConnection connection : connections){
 			if(connection.username.equals(_receivingUser)){
-				System.out.println("Sending message to: " + _receivingUser);
-				sendMessage(connection, _message, _sourceUser);
+				System.out.println("Sending personal message to: " + _receivingUser);
+				sendMessage(connection, _message);
 				break;
 			}
 		}
 	}
 
-	private void sendMessage(ServerConnection _connection, String _message, String _sourceUser) {
+	private void sendMessage(ServerConnection _connection, String _message) {
 		try {
 			PrintStream output = new PrintStream(_connection.socket.getOutputStream());
-			output.println(_sourceUser + ": " + _message);
+			output.println(_message);
 			output.flush();
 		}catch(IOException e) {
 			System.err.println("Error (unable to broadcast to " + _connection.socket.getInetAddress() + "): " + e);
@@ -83,15 +81,15 @@ class ServerWorker implements Runnable {
 class ServerConnection implements Runnable {
 	boolean running = true;
 	public Socket socket;
-	ServerWorker serverWorker;
+	Server server;
 	public String username = "";
 	public String id = "";
 
-	ServerConnection(Socket _socket, ServerWorker _serverWorker) {
+	ServerConnection(Socket _socket, Server _server) {
 		socket = _socket;
 		username = socket.getInetAddress().toString();
 		id = socket.getInetAddress().toString();
-		serverWorker = _serverWorker;
+		server = _server;
 	}
 
 	public void run() {
@@ -109,13 +107,27 @@ class ServerConnection implements Runnable {
 						} else if (command.equals("@username")) {
 							username = tokens.nextToken();
 						} else if (command.equals("@whisper")) {
-							String reciever = tokens.nextToken();
-							String privateMessage = tokens.nextToken("");
-							serverWorker.broadcastTo(privateMessage, reciever, username);
-
+							String receiver = tokens.nextToken();
+							String privateMessage = tokens.nextToken("").trim();
+							server.broadcastTo(username + " whispers: " + privateMessage, receiver);
+						} else if (command.equals("@file")) {
+							String receiver = tokens.nextToken();
+							server.broadcastTo(command + " " + username, receiver);
+							System.out.println("File request sent to " + receiver);
+						} else if(command.equals("@fileanswer")){
+							String receiver = tokens.nextToken();
+							String answer = tokens.nextToken();
+							System.out.println("Fileanswer has been received. The answer to " + receiver + " is: " + answer);
+							server.broadcastTo(command + " " + username + " " + answer, receiver);
+						} else if(command.equals("@filesocketopen")){
+							String receiver = tokens.nextToken();
+							String sourceIP = tokens.nextToken();
+							String sourcePort = tokens.nextToken();
+							System.out.println("A socket has been opened. " + sourceIP + " and " + sourcePort + " is sent to: " + receiver);
+							server.broadcastTo(command + " " + username + " " + sourceIP + " " + sourcePort, receiver);
 						}
 						else {
-							serverWorker.broadcastAll(message, username, id);
+							server.broadcastAll(username + ": " + message, id);
 						}
 					}
 				} else {
@@ -129,7 +141,7 @@ class ServerConnection implements Runnable {
 
 	private void removeConnection() {
 		try{
-			serverWorker.removeConnectionFromList(this);
+			server.removeConnectionFromList(this);
 			socket.shutdownOutput();
 			socket.close();
 			running = false;
