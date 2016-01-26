@@ -125,9 +125,6 @@ class OutputThread implements Runnable {
 
 
 
-
-
-
 					/*
 						The sender of a file will use these commands
 					*/
@@ -273,9 +270,10 @@ class FileSender implements Runnable {
 
 	FileSender(String _myIP, int _port) {
 		myIP = _myIP;
+		port = _port;
 		try {
 			serverSocket = new ServerSocket(port);
-			System.err.println("initialized serversocket for file transfer");
+			System.err.println("initialized serversocket for file transfer (port: " + port + ")");
 		} catch(IOException e) {
 			System.err.println("Filesender could not initialize serverSocket");
 		}
@@ -301,7 +299,7 @@ class FileReceiver implements Runnable {
 		sourceIP = _sourceIP;
 		port = _port;
 		try {
-			System.out.println(sourceIP+  " " + port);
+			System.out.println(sourceIP +  " " + port);
 			socket = new Socket(sourceIP, port);
 		} catch(Exception e) {
 			System.err.println("Filereceiver could not open socket: " + e);
