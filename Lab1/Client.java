@@ -314,9 +314,13 @@ class FileSender implements Runnable {
 			System.out.println("File transfer to " + socket.getInetAddress() + " is initialised.");
 			fileInputStream = new FileInputStream(file);
 			bufferedInputStream = new BufferedInputStream(fileInputStream);
-			bufferedInputStream.read(bytes, 0, bytes.length);
+			// bufferedInputStream.read(bytes, 0, bytes.length);
 			outputStream = socket.getOutputStream();
-			outputStream.write(bytes, 0, bytes.length);
+			// outputStream.write(bytes, 0, bytes.length);
+			int count;
+			while((count = bufferedInputStream.read(bytes)) > 0) {
+				outputStream.write(bytes, 0, count);
+			}
 			outputStream.flush();
 			System.out.println("File transfer to " + socket.getInetAddress() + " is completed.");
 		} catch(IOException e) {
@@ -358,7 +362,7 @@ class FileReceiver implements Runnable {
 			inputStream = socket.getInputStream();
 			fileOutputStream = new FileOutputStream(filePath);
 			bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-			inputStream.read(bytes, 0, bytes.length);
+			// inputStream.read(bytes, 0, bytes.length);
 			// int current = bytesRead;
 
 			// while (bytesRead > -1) {
@@ -368,7 +372,12 @@ class FileReceiver implements Runnable {
 			// 	}
 			// }
 
-			bufferedOutputStream.write(bytes, 0, bytes.length);
+
+			// bufferedOutputStream.write(bytes, 0, bytes.length);
+			int count;
+			while ((count = inputStream.read(bytes)) > 0) {
+				bufferedOutputStream.write(bytes, 0, count);
+			}
 			bufferedOutputStream.flush();
 			System.out.println("File transfer complete! Good job!");
 
