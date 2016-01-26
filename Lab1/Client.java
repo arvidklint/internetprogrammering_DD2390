@@ -18,7 +18,7 @@ public class Client {
 	Socket socket;
 	OutputThread output;
 	InputThread input;
-	ArrayList<String> fileRequests;
+	ArrayList<FileRequest> fileRequests;
 
 	Client (String _host, int _port) {
 		host = _host;
@@ -26,7 +26,7 @@ public class Client {
 		Scanner scanner = new Scanner(System.in);
 		System.out.print("Username: ");
 		String username = scanner.next();
-		fileRequests = new ArrayList<String>();
+		fileRequests = new ArrayList<FileRequest>();
 		
 		try {
 			socket = new Socket(host, port);
@@ -41,15 +41,15 @@ public class Client {
 		}
 	}
 
-	public void addFileRequest(String _user) {
-		fileRequests.add(_user);
+	public void addFileRequest(String _user, String _filePath, int _fileSize) {
+		fileRequests.add(new FileRequest(_user, _filePath, _fileSize));
 		System.out.println("Added request from user: " + _user);
 	}
 
 	public boolean removeFileRequest(String _user) {
 		boolean removed = false;
-		for (String fileRequest : fileRequests) {
-			if (fileRequest.equals(_user)) {
+		for (FileRequest fileRequest : fileRequests) {
+			if (fileRequest.username.equals(_user)) {
 				fileRequests.remove(fileRequest);
 				removed = true;
 				break;
@@ -62,13 +62,25 @@ public class Client {
 		return removed;
 	}
 
-	public String getFileRequest(String _user) {
-		for (String fileRequest : fileRequests) {
-			if (fileRequest.equals(_user)) {
+	public FileRequest getFileRequest(String _user) {
+		for (FileRequest fileRequest : fileRequests) {
+			if (fileRequest.username.equals(_user)) {
 				return fileRequest;
 			}
 		}
 		return null;
+	}
+}
+
+class FileRequest {
+	String username;
+	String filePath;
+	int fileSize;
+
+	FileRequest(String _username, String _filePath, int _fileSize) {
+		username = _username;
+		filePath = _filePath;
+		fileSize = _fileSize;
 	}
 }
 
@@ -130,8 +142,12 @@ class OutputThread implements Runnable {
 					*/
 					else if (command.equals("@file")) {
 						String receiver = tokens.nextToken();
-						client.addFileRequest(receiver);
-						sendMessage("@file " + receiver);
+						String filePath = tokens.nextToken();
+						File tempFile = new File(filePath);
+						int size = (int)tempFile.length();
+						System.out.println("File size: " + size + " bytes");
+						client.addFileRequest(receiver, filePath, size);
+						sendMessage("@file " + receiver + " " + filePath + " " + size);
 					}
 					
 
@@ -202,16 +218,20 @@ class InputThread implements Runnable {
 							*/
 							if (command.equals("@file")) {
 								String sourceUser = tokens.nextToken();
-								client.addFileRequest(sourceUser);
-								System.out.println(sourceUser + " wants to send you a file. Answer with '@fileanswer " + sourceUser + " yes/no': ");
+								String filePath = tokens.nextToken();
+								int size = Integer.parseInt(tokens.nextToken());
+
+								client.addFileRequest(sourceUser, filePath, size);
+								System.out.println(sourceUser + " wants to send you a file: " + filePath + "(" + size / 1000 + " kb). Answer with '@fileanswer " + sourceUser + " yes/no': ");
 							} 
 							else if (command.equals("@filesocketopen")) {
 								String sourceUser = tokens.nextToken();
 								String sourceIP = tokens.nextToken();
 								int port = Integer.parseInt(tokens.nextToken());
 								System.out.println(sourceIP + " " + port);
+								FileRequest fileRequest = client.getFileRequest(sourceUser);
 								if(client.removeFileRequest(sourceUser)) {
-									FileReceiver fileReceiver = new FileReceiver(sourceIP, port);
+									FileReceiver fileReceiver = new FileReceiver(sourceIP, port, fileRequest.filePath, fileRequest.fileSize);
 									Thread fileReceiverThread = new Thread(fileReceiver);
 									fileReceiverThread.start();
 								}
@@ -225,12 +245,12 @@ class InputThread implements Runnable {
 								String answer = tokens.nextToken();
 								if (answer.equals("yes")) {
 									System.out.println(receiver + " answered yes to request to send file.");
-									String fileRequest = client.getFileRequest(receiver); // Check if the filerequest exist
+									FileRequest fileRequest = client.getFileRequest(receiver); // Check if the filerequest exist
 									if (fileRequest != null) {
 										System.out.println("Initialising filesender");
 										String ip = socket.getLocalAddress().toString().substring(1);
 										int port = 1338;
-										FileSender fileSender = new FileSender(ip, port);
+										FileSender fileSender = new FileSender(ip, port, fileRequest.filePath);
 										Thread fileSenderThread = new Thread(fileSender);
 										fileSenderThread.start();
 										sendMessage("@filesocketopen " + receiver + " " + ip + " " + port);
@@ -265,12 +285,16 @@ class InputThread implements Runnable {
 class FileSender implements Runnable {
 	String myIP;
 	int port;
+	String filePath;
 	Socket socket;
 	ServerSocket serverSocket;
+	FileInputStream fileInputStream;
+	BufferedInputStream bufferedInputStream;
 
-	FileSender(String _myIP, int _port) {
+	FileSender(String _myIP, int _port, String _filePath) {
 		myIP = _myIP;
 		port = _port;
+		filePath = _filePath;
 		try {
 			serverSocket = new ServerSocket(port);
 			System.err.println("initialized serversocket for file transfer (port: " + port + ")");
@@ -284,6 +308,16 @@ class FileSender implements Runnable {
 			System.out.println("Waiting for connection.");
 			socket = serverSocket.accept();
 			System.out.println("filesocket connected: " + socket.getInetAddress());
+			File file = new File(filePath);
+			byte [] bytes  = new byte [(int)file.length()];
+			System.out.println("File transfer to " + socket.getInetAddress() + " is initialised.");
+			// fileInputStream = new FileInputStream(file);
+			// bufferedInputStream = new BufferedInputStream(fileInputStream);
+			// bufferedInputStream.read(bytes, 0, bytes.length);
+			OutputStream outputStream = socket.getOutputStream();
+			outputStream.write(bytes, 0, bytes.length);
+			outputStream.flush();
+			System.out.println("File transfer to " + socket.getInetAddress() + " is completed.");
 		} catch(IOException e) {
 			System.err.println("Filesender could not accept incoming socket request");
 		}
@@ -293,20 +327,53 @@ class FileSender implements Runnable {
 class FileReceiver implements Runnable {
 	String sourceIP;
 	int port;
+	int fileSize;
+	String filePath;
 	Socket socket;
+	InputStream inputStream = null;
+	FileOutputStream fileOutputStream = null;
+	BufferedOutputStream bufferedOutputStream = null;
 
-	FileReceiver(String _sourceIP, int _port) {
+	FileReceiver(String _sourceIP, int _port, String _filePath, int _fileSize) {
 		sourceIP = _sourceIP;
 		port = _port;
-		try {
-			System.out.println(sourceIP +  " " + port);
-			socket = new Socket(sourceIP, port);
-		} catch(Exception e) {
-			System.err.println("Filereceiver could not open socket: " + e);
-		}
+		fileSize = _fileSize;
+		filePath = _filePath;
 	}
 
 	public void run() {
-		
+		try {
+			socket = new Socket(sourceIP, port);
+			System.out.println("File connection is open. ");
+			byte[] bytes = new byte[fileSize];
+			inputStream = socket.getInputStream();
+			fileOutputStream = new FileOutputStream(filePath);
+			bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+			inputStream.read(bytes, 0, bytes.length);
+			bufferedOutputStream.write(bytes, 0, fileSize);
+			bufferedOutputStream.flush();
+
+			System.out.println("File transfer complete! Good job!");
+
+			// int current = 0;
+			// int bytesRead = 0;
+
+			// while (bytesRead > -1) {
+			// 	bytesRead = inputStream.read(bytes, current, bytes.length - current);
+			// 	if (bytesRead >= 0) {
+			// 		current += bytesRead;
+			// 	}
+			// }
+		} catch(Exception e) {
+			System.err.println("Filereceiver could not open socket: " + e);
+		} finally {
+			try {
+				if (fileOutputStream != null) fileOutputStream.close();
+				if (bufferedOutputStream != null) bufferedOutputStream.close();
+				if (socket != null) socket.close();
+			} catch(IOException e) {
+				System.err.println("Could not close shit.");
+			}
+		}
 	}
 }
