@@ -290,6 +290,7 @@ class FileSender implements Runnable {
 	ServerSocket serverSocket;
 	FileInputStream fileInputStream;
 	BufferedInputStream bufferedInputStream;
+	OutputStream outputStream;
 
 	FileSender(String _myIP, int _port, String _filePath) {
 		myIP = _myIP;
@@ -311,15 +312,23 @@ class FileSender implements Runnable {
 			File file = new File(filePath);
 			byte [] bytes  = new byte [(int)file.length()];
 			System.out.println("File transfer to " + socket.getInetAddress() + " is initialised.");
-			// fileInputStream = new FileInputStream(file);
-			// bufferedInputStream = new BufferedInputStream(fileInputStream);
-			// bufferedInputStream.read(bytes, 0, bytes.length);
-			OutputStream outputStream = socket.getOutputStream();
+			fileInputStream = new FileInputStream(file);
+			bufferedInputStream = new BufferedInputStream(fileInputStream);
+			bufferedInputStream.read(bytes, 0, bytes.length);
+			outputStream = socket.getOutputStream();
 			outputStream.write(bytes, 0, bytes.length);
 			outputStream.flush();
 			System.out.println("File transfer to " + socket.getInetAddress() + " is completed.");
 		} catch(IOException e) {
 			System.err.println("Filesender could not accept incoming socket request");
+		} finally {
+			try {
+				if (outputStream != null) outputStream.close();
+				if (bufferedInputStream != null) bufferedInputStream.close();
+				if (socket != null) socket.close();
+			} catch(IOException e) {
+				System.err.println("Could not close shit.");
+			}
 		}
 	}
 }
@@ -350,13 +359,7 @@ class FileReceiver implements Runnable {
 			fileOutputStream = new FileOutputStream(filePath);
 			bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 			inputStream.read(bytes, 0, bytes.length);
-			bufferedOutputStream.write(bytes, 0, fileSize);
-			bufferedOutputStream.flush();
-
-			System.out.println("File transfer complete! Good job!");
-
-			// int current = 0;
-			// int bytesRead = 0;
+			// int current = bytesRead;
 
 			// while (bytesRead > -1) {
 			// 	bytesRead = inputStream.read(bytes, current, bytes.length - current);
@@ -364,6 +367,11 @@ class FileReceiver implements Runnable {
 			// 		current += bytesRead;
 			// 	}
 			// }
+
+			bufferedOutputStream.write(bytes, 0, bytes.length);
+			bufferedOutputStream.flush();
+			System.out.println("File transfer complete! Good job!");
+
 		} catch(Exception e) {
 			System.err.println("Filereceiver could not open socket: " + e);
 		} finally {
