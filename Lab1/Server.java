@@ -76,4 +76,23 @@ public class Server implements Runnable{
 			System.out.println("Source address: " + connection.socket.getInetAddress());
 		}
 	}
+
+	public synchronized ArrayList<String> getOtherUsers(String _sourceUser) {
+		ArrayList<String> users = new ArrayList<String>();
+		for(ServerConnection connection : connections){
+			if(!connection.username.equals(_sourceUser)){
+				users.add(connection.username);
+			}
+		}
+		return users;
+	}
+
+	public boolean isUsernameAvailability(String _sourceUser) {
+		for(ServerConnection connection : connections){
+			if(connection.username.equals(_sourceUser)){
+				return false;
+			}
+		}
+		return true;
+	}
 }
