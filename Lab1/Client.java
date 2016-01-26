@@ -246,7 +246,7 @@ class InputThread implements Runnable {
 								if (answer.equals("yes")) {
 									System.out.println(receiver + " answered yes to request to send file.");
 									FileRequest fileRequest = client.getFileRequest(receiver); // Check if the filerequest exist
-									if (fileRequest != null) {
+									if (client.removeFileRequest(receiver)) {
 										System.out.println("Initialising filesender");
 										String ip = socket.getLocalAddress().toString().substring(1);
 										int port = 1338;
