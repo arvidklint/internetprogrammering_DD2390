@@ -9,7 +9,8 @@ public class Server{
 		while(true){
 			System.out.println("Waiting for connections.");
 		    Socket s = ss.accept();
-		    Integer randomNumber = 9000000000;
+		    System.out.println("Connection Established");
+		    Integer randomNumber = 900000;
 		    BufferedReader request = new BufferedReader(new InputStreamReader(s.getInputStream()));
 		    PrintStream response = new PrintStream(s.getOutputStream());
 		    String str = request.readLine();
@@ -27,7 +28,7 @@ public class Server{
 			if(requestedDocument.indexOf(".html") != -1)
 				response.println("Content-Type: text/html");
 			response.println("Set-Cookie: clientId=1; expires=Wednesday,31-Dec-2017 21:00:00 GMT");
-			
+		
 			/* HTTP BODY */
 			response.println();
  			File file = new File("."+requestedDocument);
@@ -39,7 +40,7 @@ public class Server{
 		    }
 
 		    response.println("Your guess was: " + guessNumber);
-		    response.writeBytes(responseString);
+		    // response.writeBytes(responseString);
 		    response.flush();
 		    response.close();		 
 	 

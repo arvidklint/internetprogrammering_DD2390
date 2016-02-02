@@ -1,7 +1,7 @@
 <?php
 
 $guess = $_GET["guess"];
-$requestedDocument = "index.html";
+$requestedDocument = "/index.html";
 
 $PORT = 8081;
 $ADDRESS = 'localhost';
@@ -14,7 +14,7 @@ if( !socket_connect($socket, $ADDRESS, $PORT) ){
 	echo "Socket could not connect.\n";
 }
 
-$message = $guess ." " .$requestedDocument;
+$message = $guess ." " .$requestedDocument ."\n";
 $messageLength = strlen($message);
 
 $socketStatus = socket_sendto($socket, $message, $messageLength, MSG_EOF, $ADDRESS, $PORT);
