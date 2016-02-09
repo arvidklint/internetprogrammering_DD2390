@@ -24,6 +24,9 @@ public class HttpServer {
 			StringTokenizer tokens = new StringTokenizer(str," ?=");
 			tokens.nextToken();
 			String requestedDocument = tokens.nextToken();
+			if (requestedDocument.equals("/")) {
+				requestedDocument = "/index.html";
+			}
 			int guess = 0;
 			if (tokens.hasMoreTokens()) {
 				if (tokens.nextToken().equals("guess")) {
@@ -39,7 +42,7 @@ public class HttpServer {
 				System.out.println(str);
 				if (str.toLowerCase().contains("cookie:")) {
 					clientId = getClientId(str);
-					System.out.println("Client ID: " + clientId);
+					// System.out.println("Client ID: " + clientId);
 				}
 			}
 
@@ -99,6 +102,8 @@ public class HttpServer {
 						response.println("<div>" + message + "</div>");
 					}
 				}
+			} catch (Exception e) {
+				System.err.println("Error: " + e);
 			}
 
 			s.shutdownOutput();
@@ -120,7 +125,7 @@ public class HttpServer {
 	}
 
 	private String getClientId(String _str) {
-		System.out.println("Get client id");
+		// System.out.println("Get client id");
 		String cid = "";
 		if(_str.contains("clientId")) {
 			StringTokenizer tokens = new StringTokenizer(_str, " =;");
@@ -131,7 +136,7 @@ public class HttpServer {
 					cid = tokens.nextToken();
 					break;
 				} 
-				System.out.println(next);
+				// System.out.println(next);
 			}
 		} else {
 			cid = UUID.randomUUID().toString();
