@@ -9,7 +9,29 @@
 			Width: <input type="number" id="width" value="9"/> Height: <input type="number" id="height" value="9"/>
 			<button id="generateButton">Generate Board</button>
 		</div>
-		<div id="playingBoard"></div>
+		<div id="boardContainer">
+			<div id="scoreBoard">
+				<table>
+					<tr>
+						<th>Ships placed</th>
+						<th>Ships destroyed</th>
+						<th>Shots fired</th>
+					</tr>
+					<tr>
+						<td id="shipsPlaced"></td>
+						<td id="shipsDestroyed"></td>
+						<td id="shotsFired"></td>
+					</tr>
+				</table>
+			</div>
+			<div id="playingBoardContainer">
+				<div id="playingBoard"></div>
+				<div id="winningOverlay">
+					<div id="winningText"><h1>Game is over!</h1></div>
+				</div>
+			</div>
+		</div>
+		<div id="startButtonContainer"><button id="startGameButton">Start Game</button><button id="resetGameButton">Reset Game</button></div>
 		<script src="js/battleShip.js"></script>
 	</body>
 </html>
