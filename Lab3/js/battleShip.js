@@ -128,10 +128,11 @@ function placeShip(_length, _xPos, _yPos){
 }
 
 function removeShip(_length, _xPos, _yPos){
+	var orientation;
 	if(mode === 0){
 		for(var j = 0; j < shipObjects.length; j++){
 			if( (shipObjects[j].xPos === _xPos) && (shipObjects[j].yPos === _yPos) && (shipObjects[j].length !== undefined) ){
-				var orientation = shipObjects[j].vertical;
+				orientation = shipObjects[j].vertical;
 				shipObjects.splice(j, 1);
 				console.log(shipObjects);
 			}
@@ -160,7 +161,6 @@ function hideShips(){
 				return function() {
 					if(gameWon === false){
 						totalShotsFired++;
-						updateScoreBoardView();
 					}
 					if(this.className.indexOf("shipPiece") > -1){
 						this.style.backgroundColor = 'yellow';	
@@ -173,10 +173,12 @@ function hideShips(){
 					else{
 						this.style.backgroundColor = "red";
 					}
+					updateScoreBoardView();
 				};
 			})();
 		}
 	}
+	
 }
 
 function checkHit(_xPos, _yPos){
@@ -222,7 +224,6 @@ function resetGame(){
 	shipObjects = [];
 	totalShotsFired = 0;
 	gameWon = false;
-	console.log("Changing mode to '0'. Reseting game.")
 	changeMode(0);
 	generateGrid();
 }
