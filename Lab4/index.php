@@ -1,32 +1,46 @@
-<?php
-echo 'Hello World';
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Lab4</title>
+		<meta charset="UTF-8"/>
+	</head>
+	<body>
+		<div>
+			Sök: 
+			<input type="text" id="search" oninput="search()"></input>
+			<select id="county" oninput="search()">
+			<?php
+				$host = 'localhost';
+				$user = 'root';
+				$pw = 'root';
+				$dbname = 'Lab4';
 
-$host = 'localhost';
-$user = 'root';
-$pw = 'root';
-$db = 'Lab4';
+				$search = $_GET['search'];
 
-$link = mysql_connect($host, $user, $pw);
+				$db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pw);
+				$query = "SELECT county FROM residence GROUP BY county;";
 
-mysql_select_db($db) or die(mysql_error());
+				try {
+					$stmt = $db->prepare($query);
+					$stmt->execute();
+				} catch(PDOException $e) {
+					echo "Query Error: " . $e;
+				}
 
-if( !$link ){
-	echo 'Connection Failed';
-}
+				while($line = $stmt->fetch(PDO::FETCH_ASSOC)){ 
+					$county = $line['county'];
+					echo "<option value='$county'>$county</option>";
+				}
+			?>
+			</select>
+		</div>
 
-$query = 'SELECT * FROM residence;';
+		<table id="table">
+			
+		</table>
 
-if( ($result = mysql_query($query, $link)) === false ){
-	echo 'Query Failed: ' . mysql_error();
-	exit();
-}
+		<script src="js/index.js"></script>
 
-while( $line = mysql_fetch_assoc($result)){
-	$county = $line['county'];
-	$
-	$
-	$
-	$
-	echo $county;
-}
-?>
+	</body>
+</html>
+
