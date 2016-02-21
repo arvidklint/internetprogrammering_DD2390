@@ -1,20 +1,10 @@
-<tr>
-	<th>County</th>
-	<th>Type</th>
-	<th>Address</th>
-	<th>Area [m2]</th>
-	<th>Rooms</th>
-	<th>Price [SEK]</th>
-	<th>Rent [SEK]</th>
-</tr>
-
 <?php
 $host = 'localhost';
 $user = 'root';
 $pw = 'root';
 $dbname = 'Lab4';
 
-$search = "%".$_GET['search']."%";
+$search = $_GET['search'];
 $county = $_GET['county'];
 $residenceType = $_GET['residenceType'];
 $minRooms = $_GET['minRooms'];
@@ -25,27 +15,35 @@ $minArea = $_GET['minArea'];
 $maxArea = $_GET['maxArea'];
 $minRent = $_GET['minRent'];
 $maxRent = $_GET['maxRent'];
+$orderBy = $_GET['orderBy'];
+$orderDirection = $_GET['orderDirection'];
+
+
+setcookie("searchValues", serialize($_GET));
+
+
+$search = "%".$search."%";
 
 $objectString = ' objectType = :objectType AND ';
-if($residenceType === 'all'){
+if($residenceType === 'alltypes'){
 	$objectString = '';
 }
 
 $countyString = ' county = :county AND ';
-if($county === 'all'){
+if($county === 'allcounties'){
 	$countyString = '';
 }
 
 
 $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pw);
-$query = "SELECT * 	FROM residence WHERE $countyString $objectString address LIKE :address AND room >= :minRooms AND room <= :maxRooms AND price >= :minPrice AND price <= :maxPrice AND area >= :minArea AND area <= :maxArea AND rent >= :minRent AND rent <= :maxRent ORDER BY price ASC;";
+$query = "SELECT * 	FROM residence WHERE $countyString $objectString address LIKE :address AND room >= :minRooms AND room <= :maxRooms AND price >= :minPrice AND price <= :maxPrice AND area >= :minArea AND area <= :maxArea AND rent >= :minRent AND rent <= :maxRent ORDER BY $orderBy $orderDirection;";
 
 try {
 	$stmt = $db->prepare($query);
-	if($county !== 'all'){
+	if($county !== 'allcounties'){
 		$stmt->bindParam(':county', $county, PDO::PARAM_STR);
 	}
-	if($residenceType !== 'all'){
+	if($residenceType !== 'alltypes'){
 		$stmt->bindParam(':objectType', $residenceType, PDO::PARAM_STR);
 	}
 	$stmt->bindParam(':address', $search, PDO::PARAM_STR);

@@ -27,10 +27,10 @@
 				} catch(PDOException $e) {
 					echo "Query Error: " . $e;
 				}
-				echo "<option value='all'> – </option>";
+				echo "<option id='allcounties' value='allcounties'> – </option>";
 				while($line = $stmt->fetch(PDO::FETCH_ASSOC)){ 
 					$county = $line['county'];
-					echo "<option value='$county'>$county</option>";
+					echo "<option id='$county' value='$county'>$county</option>";
 				}
 			?>
 			</select>
@@ -51,7 +51,7 @@
 					} catch(PDOException $e) {
 						echo "Query Error: " . $e;
 					}
-					echo "<option value='all'> – </option>";
+					echo "<option id='alltypes' value='alltypes'> – </option>";
 					while($line = $stmt->fetch(PDO::FETCH_ASSOC)){ 
 						$type = $line['objectType'];
 						echo "<option value='$type'>$type</option>";
@@ -61,27 +61,40 @@
 		</div>
 
 		<div class="slider" id="room-container">
-			<div id="room-amount">Rooms:</div>
+			<div>Rum: <span id="room-amount"></span></div>
 			<div id="slider-rooms"></div>
 		</div>
 
 		<div class="slider" id="price-container">
-			<div id="price-amount">Price range:</div>
+			<div>Pris: <span id="price-amount"></span></div>
 			<div id="slider-price"></div>
 		</div>
 
 		<div class="slider" id="area-container">
-			<div id="area-amount">Area:</div>
+			<div>Area: <span id="area-amount"></span></div>
 			<div id="slider-area"></div>
 		</div>
 
 		<div class="slider" id="rent-container">
-			<div id="rent-amount">Rent:</div>
+			<div>Rent: <span id="rent-amount"></span></div>
 			<div id="slider-rent"></div>
 		</div>
 
-		<table id="table">
-			
+		<table>
+			<thead>
+				<tr id="table-header">
+					<th id="county">Län</th>
+					<th id="objectType">Bostadstyp</th>
+					<th id="address">Adress</th>
+					<th id="area">Area [m2]</th>
+					<th id="room">Antal rum</th>
+					<th id="price">Pris [SEK]</th>
+					<th id="rent">Hyra [SEK]</th>
+				</tr>
+			</thead>
+			<tbody id="table">
+				
+			</tbody>
 		</table>
 
 		<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
