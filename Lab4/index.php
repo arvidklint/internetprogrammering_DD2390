@@ -13,10 +13,10 @@
 			Län: 
 			<select id="county" oninput="search()">
 			<?php
-				$host = 'localhost';
-				$user = 'root';
-				$pw = 'root';
-				$dbname = 'Lab4';
+				$host = 'mysql­-vt2016.csc.kth.se';
+				$user = 'emiwes_user';
+				$pw = 'HXLZZ8Si';
+				$dbname = 'emiwes';
 
 				$db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pw);
 				$query = "SELECT county FROM residence GROUP BY county;";
@@ -37,10 +37,10 @@
 			Bostadstyp:
 			<select id="residence-type" oninput="search()">
 				<?php
-					$host = 'localhost';
-					$user = 'root';
-					$pw = 'root';
-					$dbname = 'Lab4';
+					$host = 'mysql­-vt2016.csc.kth.se';
+					$user = 'emiwes_user';
+					$pw = 'HXLZZ8Si';
+					$dbname = 'emiwes';
 
 					$db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pw);
 					$query = "SELECT objectType FROM residence GROUP BY objectType;";

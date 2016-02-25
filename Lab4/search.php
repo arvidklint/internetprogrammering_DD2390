@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost';
-$user = 'root';
-$pw = 'root';
-$dbname = 'Lab4';
+$host = 'mysql-­vt2016.csc.kth.se';
+$user = 'emiwes_user';
+$pw = 'HXLZZ8Si';
+$dbname = 'emiwes';
 
 $search = $_GET['search'];
 $county = $_GET['county'];
