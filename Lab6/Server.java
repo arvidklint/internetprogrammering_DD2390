@@ -1,19 +1,32 @@
 import java.io.*;
 import javax.net.ssl.*;
-
+import java.security.*;
+import java.security.cert.*;
 
 public class Server {
   static final int port = 1234;
-  SSLServerSocket sslServerSocket;
 
   public static void main(String[] args) {
-    try {
-      SSLServerSocketFactory sslServfact = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
-      sslServerSocket = (SSLServerSocket)sslSrvFact.createServerSocket(port);
+    SSLServerSocket sslServerSocket;
 
+    try {
+      SSLServerSocketFactory sslServFact = (SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
+      sslServerSocket = (SSLServerSocket)sslServFact.createServerSocket(port);
+
+      System.out.println("Waiting for connection.");
       SSLSocket sslSocket = (SSLSocket)sslServerSocket.accept();
-      OutputStream out = sslSocket.getOutputStream();
-      InputStream in = sslSocket.getInputStream();
+      System.out.println("Connection established?...");
+      PrintStream out = new PrintStream(sslSocket.getOutputStream());
+
+      out.println("HTTP/1.0 200 OK");
+      out.println("Server : SSLServer 0.1 Beta");
+      out.println("Content-Type: text/html");
+      out.println();
+      out.println("<h1>Hello World!</h1>");
+      out.flush();
+      out.close();
+
+      sslSocket.close();
     }
     catch (IOException e) {
       System.err.println(e.getMessage());
