@@ -1,0 +1,38 @@
+04-Mar-2016 13:14:01.736 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version:        Apache Tomcat/8.0.32
+04-Mar-2016 13:14:01.739 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Feb 2 2016 19:34:53 UTC
+04-Mar-2016 13:14:01.740 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server number:         8.0.32.0
+04-Mar-2016 13:14:01.740 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Mac OS X
+04-Mar-2016 13:14:01.740 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.11.3
+04-Mar-2016 13:14:01.741 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          x86_64
+04-Mar-2016 13:14:01.741 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             /Library/Java/JavaVirtualMachines/jdk1.7.0_79.jdk/Contents/Home/jre
+04-Mar-2016 13:14:01.741 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           1.7.0_79-b15
+04-Mar-2016 13:14:01.741 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+04-Mar-2016 13:14:01.742 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32
+04-Mar-2016 13:14:01.742 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32
+04-Mar-2016 13:14:01.743 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=/Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/conf/logging.properties
+04-Mar-2016 13:14:01.743 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+04-Mar-2016 13:14:01.743 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.endorsed.dirs=/Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/endorsed
+04-Mar-2016 13:14:01.743 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=/Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32
+04-Mar-2016 13:14:01.744 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=/Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32
+04-Mar-2016 13:14:01.744 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=/Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/temp
+04-Mar-2016 13:14:01.744 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: /Users/arvidsat/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.
+04-Mar-2016 13:14:01.986 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+04-Mar-2016 13:14:02.023 INFO [main] org.apache.tomcat.util.net.NioSelectorPool.getSharedSelector Using a shared selector for servlet write/read
+04-Mar-2016 13:14:02.030 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["ajp-nio-8009"]
+04-Mar-2016 13:14:02.032 INFO [main] org.apache.tomcat.util.net.NioSelectorPool.getSharedSelector Using a shared selector for servlet write/read
+04-Mar-2016 13:14:02.032 INFO [main] org.apache.catalina.startup.Catalina.load Initialization processed in 989 ms
+04-Mar-2016 13:14:02.065 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service Catalina
+04-Mar-2016 13:14:02.066 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet Engine: Apache Tomcat/8.0.32
+04-Mar-2016 13:14:02.078 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/docs
+04-Mar-2016 13:14:02.663 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/docs has finished in 584 ms
+04-Mar-2016 13:14:02.663 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/examples
+04-Mar-2016 13:14:03.155 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/examples has finished in 492 ms
+04-Mar-2016 13:14:03.155 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/host-manager
+04-Mar-2016 13:14:03.187 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/host-manager has finished in 32 ms
+04-Mar-2016 13:14:03.187 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/manager
+04-Mar-2016 13:14:03.225 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/manager has finished in 38 ms
+04-Mar-2016 13:14:03.225 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/ROOT
+04-Mar-2016 13:14:03.253 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /Users/arvidsat/Dropbox/KTH/internetprogrammering DD2390/Lab5/apache-tomcat-8.0.32/webapps/ROOT has finished in 28 ms
+04-Mar-2016 13:14:03.258 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+04-Mar-2016 13:14:03.265 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["ajp-nio-8009"]
+04-Mar-2016 13:14:03.265 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in 1232 ms
